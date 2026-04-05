@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Parking Allocation System </title>
+  <style>
+    :root {
+      --bg: #f2f6fb;
+      --panel: #ffffff;
+      --ink: #16202a;
+      --sub: #5f6b77;
+      --ok: #157f3b;
+      --warn: #b45309;
+      --bad: #b42318;
+      --line: #d7e0ea;
+      --accent: #0f6cbd;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: radial-gradient(circle at top right, #e8f1ff, #f7fbff 40%, #f2f6fb);
+      color: var(--ink);
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .title {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: #0c3a66;
+    }
+
+    .title p {
+      margin: 6px 0 0;
+      color: var(--sub);
+      font-size: 0.92rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .card .k {
+      color: var(--sub);
+      font-size: 0.8rem;
+    }
+
+    .card .v {
+      margin-top: 4px;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #0d4f8b;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.02rem;
+      color: #0d4f8b;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    label { font-size: 0.88rem; color: var(--sub); }
+
+    input, select {
+      width: 100%;
+      border: 1px solid #becbd9;
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-size: 0.92rem;
+      text-transform: uppercase;
+      background: #fff;
+    }
+
+    .btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .b-park {
+      background: #e6f7ed;
+      color: #0f6c2f;
+      border-color: #b6e2c5;
+    }
+
+    .b-exit {
+      background: #fff1e8;
+      color: #9a3412;
+      border-color: #ffd4bf;
+    }
+
+    .msg {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      display: none;
+    }
+
+    .msg.ok { display: block; background: #ecfdf3; color: var(--ok); border: 1px solid #b7efcc; }
+    .msg.warn { display: block; background: #fffbeb; color: var(--warn); border: 1px solid #f7e5b1; }
+    .msg.bad { display: block; background: #fef2f2; color: var(--bad); border: 1px solid #f8caca; }
+
+    .concepts ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .concepts li {
+      margin-bottom: 7px;
+      color: #2f3c48;
+      font-size: 0.9rem;
+    }
+
+    .types {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+      gap: 8px;
+    }
+
+    .type-chip {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 0.87rem;
+      background: #fafcff;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .slot-area {
+      margin-top: 12px;
+    }
+
+    .slot-type {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      background: #fbfdff;
+    }
+
+    .slot-head {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.87rem;
+      color: #27445f;
+      font-weight: 600;
+    }
+
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(42px, 1fr));
+      gap: 6px;
+      padding: 8px;
+    }
+
+    .slot {
+      border: 1px solid;
+      border-radius: 7px;
+      text-align: center;
+      font-size: 0.73rem;
+      padding: 7px 2px;
+    }
+
+    .slot.free { background: #edfff2; border-color: #a8e2b8; color: #1b7a3d; }
+    .slot.occ { background: #fff0f0; border-color: #f2b4b4; color: #9b1c1c; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.86rem;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 7px 6px;
+      text-align: left;
+    }
+
+    th { color: #355b7a; background: #f6faff; }
+
+    .scroller {
+      max-height: 230px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    @media (max-width: 1000px) {
+      .layout { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+      .slot-grid { grid-template-columns: repeat(6, minmax(42px, 1fr)); }
+      .types { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <h1>Smart Parking Allocation System</h1>
+      <!-- <p>Visual mini project aligned to DAA: nearest-slot greedy allocation, active records, duration tracking, and type-wise parking spaces.</p> -->
+    </div>
+
+    <div class="cards">
+      <div class="card"><div class="k">Available Slots</div><div class="v" id="statAvailable">0</div></div>
+      <div class="card"><div class="k">Occupied Slots</div><div class="v" id="statOccupied">0</div></div>
+      <div class="card"><div class="k">Total Capacity</div><div class="v" id="statTotal">0</div></div>
+      <div class="card"><div class="k">Vehicle Types</div><div class="v" id="statTypes">0</div></div>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <h2>Vehicle Entry and Exit</h2>
+
+        <div class="form-row">
+          <label for="plateInput">Vehicle Number</label>
+          <input id="plateInput" placeholder="TN01AB1234" maxlength="15" />
+        </div>
+
+        <div class="form-row">
+          <label for="typeInput">Vehicle Type</label>
+          <select id="typeInput"></select>
+        </div>
+
+        <div class="btns">
+          <button class="b-park" id="parkBtn">Park Vehicle</button>
+          <button class="b-exit" id="exitBtn">Vehicle Exit</button>
+        </div>
+
+        <div id="message" class="msg"></div>
+
+        <div class="types" id="typeAvailability"></div>
+
+        <!-- <div class="concepts" style="margin-top: 12px;">
+          <h2>DAA Concepts Used</h2>
+          <ul>
+            <li>Greedy strategy: choose nearest free slot in the selected vehicle category.</li>
+            <li>Min-Heap per type: fast nearest-slot allocation with O(log n) pop and push.</li>
+            <li>Hash map by vehicle number: O(1) average lookup for exit and status checks.</li>
+            <li>Type-based partitioning: each vehicle category has dedicated capacity.</li>
+            <li>Live time tracking: parked duration updates every second.</li>
+          </ul>
+        </div> -->
+      </div>
+
+      <div class="panel">
+        <h2>Parking Map by Vehicle Type</h2>
+        <div class="slot-area" id="slotArea"></div>
+      </div>
+    </div>
+
+    <div class="layout" style="margin-top: 12px;">
+      <div class="panel">
+        <h2>Currently Parked Vehicles</h2>
+        <div class="scroller">
+          <table>
+            <thead>
+              <tr>
+                <th>Vehicle No</th>
+                <th>Type</th>
+                <th>Slot</th>
+                <th>Parked Time</th>
+              </tr>
+            </thead>
+            <tbody id="activeBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Exit Records</h2>
+        <div class="scroller">
+          <table>
+            <thead>
+              <tr>
+                <th>Vehicle No</th>
+                <th>Type</th>
+                <th>Slot</th>
+                <th>Total Duration</th>
+              </tr>
+            </thead>
+            <tbody id="exitBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const VEHICLE_TYPES = [
+      { id: "two", label: "2-Wheeler", capacity: 12, baseDistance: 8 },
+      { id: "auto", label: "Auto", capacity: 7, baseDistance: 12 },
+      { id: "car", label: "Car", capacity: 14, baseDistance: 18 },
+      { id: "van", label: "Mini Van", capacity: 6, baseDistance: 26 },
+      { id: "truck", label: "Truck/Lorry", capacity: 5, baseDistance: 40 }
+    ];
+
+    class MinHeap {
+      constructor() { this.arr = []; }
+      push(item) {
+        this.arr.push(item);
+        this._up(this.arr.length - 1);
+      }
+      pop() {
+        if (!this.arr.length) return null;
+        const root = this.arr[0];
+        const last = this.arr.pop();
+        if (this.arr.length) {
+          this.arr[0] = last;
+          this._down(0);
+        }
+        return root;
+      }
+      size() { return this.arr.length; }
+      _up(i) {
+        while (i > 0) {
+          const p = Math.floor((i - 1) / 2);
+          if (this.arr[p].distance <= this.arr[i].distance) break;
+          [this.arr[p], this.arr[i]] = [this.arr[i], this.arr[p]];
+          i = p;
+        }
+      }
+      _down(i) {
+        const n = this.arr.length;
+        while (true) {
+          let best = i;
+          const l = 2 * i + 1;
+          const r = 2 * i + 2;
+          if (l < n && this.arr[l].distance < this.arr[best].distance) best = l;
+          if (r < n && this.arr[r].distance < this.arr[best].distance) best = r;
+          if (best === i) break;
+          [this.arr[best], this.arr[i]] = [this.arr[i], this.arr[best]];
+          i = best;
+        }
+      }
+    }
+
+    const parkingData = {};
+    const activeByPlate = new Map();
+    const exitRecords = [];
+
+    const statAvailable = document.getElementById("statAvailable");
+    const statOccupied = document.getElementById("statOccupied");
+    const statTotal = document.getElementById("statTotal");
+    const statTypes = document.getElementById("statTypes");
+
+    const plateInput = document.getElementById("plateInput");
+    const typeInput = document.getElementById("typeInput");
+    const messageBox = document.getElementById("message");
+
+    const typeAvailability = document.getElementById("typeAvailability");
+    const slotArea = document.getElementById("slotArea");
+    const activeBody = document.getElementById("activeBody");
+    const exitBody = document.getElementById("exitBody");
+
+    function boot() {
+      initSlots();
+      initTypeSelect();
+      seedSampleData();
+      renderAll();
+      setInterval(renderActiveTable, 1000);
+
+      document.getElementById("parkBtn").addEventListener("click", onPark);
+      document.getElementById("exitBtn").addEventListener("click", onExit);
+    }
+
+    function initSlots() {
+      for (const t of VEHICLE_TYPES) {
+        const slots = [];
+        const heap = new MinHeap();
+
+        for (let i = 0; i < t.capacity; i++) {
+          const slot = {
+            idx: i,
+            id: `${t.id.toUpperCase()}-${String(i + 1).padStart(2, "0")}`,
+            distance: t.baseDistance + i * 2,
+            occupied: false,
+            plate: null,
+            entryMs: null
+          };
+          slots.push(slot);
+          heap.push({ distance: slot.distance, idx: i });
+        }
+
+        parkingData[t.id] = { type: t, slots, heap };
+      }
+    }
+
+    function initTypeSelect() {
+      typeInput.innerHTML = "";
+      for (const t of VEHICLE_TYPES) {
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.label;
+        typeInput.appendChild(opt);
+      }
+      statTypes.textContent = String(VEHICLE_TYPES.length);
+    }
+
+    function showMessage(text, mode) {
+      messageBox.className = `msg ${mode}`;
+      messageBox.textContent = text;
+      window.clearTimeout(showMessage._timer);
+      showMessage._timer = window.setTimeout(() => {
+        messageBox.className = "msg";
+        messageBox.textContent = "";
+      }, 2500);
+    }
+
+    function normalizePlate(raw) {
+      return raw.trim().toUpperCase();
+    }
+
+    function isValidPlate(plate) {
+      return /^[A-Z0-9-]{4,15}$/.test(plate);
+    }
+
+    function allocateNearest(typeId) {
+      const group = parkingData[typeId];
+      while (group.heap.size() > 0) {
+        const node = group.heap.pop();
+        const slot = group.slots[node.idx];
+        if (!slot.occupied) return slot;
+      }
+      return null;
+    }
+
+    function onPark() {
+      const plate = normalizePlate(plateInput.value);
+      const typeId = typeInput.value;
+
+      if (!isValidPlate(plate)) {
+        showMessage("Enter a valid vehicle number (A-Z, 0-9, dash).", "warn");
+        return;
+      }
+
+      if (activeByPlate.has(plate)) {
+        showMessage(`${plate} is already parked.`, "warn");
+        return;
+      }
+
+      const slot = allocateNearest(typeId);
+      if (!slot) {
+        showMessage(`No free slots available for ${parkingData[typeId].type.label}.`, "bad");
+        return;
+      }
+
+      slot.occupied = true;
+      slot.plate = plate;
+      slot.entryMs = Date.now();
+
+      activeByPlate.set(plate, {
+        plate,
+        typeId,
+        slotId: slot.id,
+        slotIdx: slot.idx,
+        entryMs: slot.entryMs
+      });
+
+      plateInput.value = "";
+      showMessage(`${plate} parked at ${slot.id}.`, "ok");
+      renderAll();
+    }
+
+    function onExit() {
+      const plate = normalizePlate(plateInput.value);
+      if (!plate) {
+        showMessage("Enter vehicle number for exit.", "warn");
+        return;
+      }
+
+      const rec = activeByPlate.get(plate);
+      if (!rec) {
+        showMessage(`${plate} is not currently parked.`, "bad");
+        return;
+      }
+
+      const group = parkingData[rec.typeId];
+      const slot = group.slots[rec.slotIdx];
+
+      const durationSec = Math.max(0, Math.floor((Date.now() - rec.entryMs) / 1000));
+
+      slot.occupied = false;
+      slot.plate = null;
+      slot.entryMs = null;
+      group.heap.push({ distance: slot.distance, idx: slot.idx });
+
+      activeByPlate.delete(plate);
+      exitRecords.unshift({
+        plate,
+        typeLabel: group.type.label,
+        slotId: slot.id,
+        durationSec
+      });
+
+      plateInput.value = "";
+      showMessage(`${plate} exited. Total parked: ${formatDuration(durationSec)}.`, "ok");
+      renderAll();
+    }
+
+    function formatDuration(totalSec) {
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function renderStats() {
+      let total = 0;
+      let free = 0;
+      for (const t of VEHICLE_TYPES) {
+        const slots = parkingData[t.id].slots;
+        total += slots.length;
+        free += slots.filter(s => !s.occupied).length;
+      }
+      statTotal.textContent = String(total);
+      statAvailable.textContent = String(free);
+      statOccupied.textContent = String(total - free);
+    }
+
+    function renderTypeAvailability() {
+      typeAvailability.innerHTML = "";
+      for (const t of VEHICLE_TYPES) {
+        const slots = parkingData[t.id].slots;
+        const free = slots.filter(s => !s.occupied).length;
+        const chip = document.createElement("div");
+        chip.className = "type-chip";
+        chip.innerHTML = `<span>${t.label}</span><strong>${free} / ${slots.length}</strong>`;
+        typeAvailability.appendChild(chip);
+      }
+    }
+
+    function renderSlotMap() {
+      slotArea.innerHTML = "";
+
+      for (const t of VEHICLE_TYPES) {
+        const group = parkingData[t.id];
+        const slots = group.slots;
+        const free = slots.filter(s => !s.occupied).length;
+
+        const block = document.createElement("div");
+        block.className = "slot-type";
+
+        const head = document.createElement("div");
+        head.className = "slot-head";
+        head.innerHTML = `<span>${t.label}</span><span>Available ${free}/${slots.length}</span>`;
+
+        const grid = document.createElement("div");
+        grid.className = "slot-grid";
+
+        for (const s of slots) {
+          const div = document.createElement("div");
+          div.className = `slot ${s.occupied ? "occ" : "free"}`;
+          div.title = s.occupied ? `${s.id} | ${s.plate}` : `${s.id} | FREE`;
+          div.innerHTML = `<div>${s.id.split("-")[1]}</div><div>${s.occupied ? "OCC" : "FREE"}</div>`;
+          grid.appendChild(div);
+        }
+
+        block.appendChild(head);
+        block.appendChild(grid);
+        slotArea.appendChild(block);
+      }
+    }
+
+    function renderActiveTable() {
+      const rows = Array.from(activeByPlate.values()).sort((a, b) => a.entryMs - b.entryMs);
+      activeBody.innerHTML = rows.map(r => {
+        const typeLabel = parkingData[r.typeId].type.label;
+        const liveSec = Math.max(0, Math.floor((Date.now() - r.entryMs) / 1000));
+        return `<tr><td>${r.plate}</td><td>${typeLabel}</td><td>${r.slotId}</td><td>${formatDuration(liveSec)}</td></tr>`;
+      }).join("") || `<tr><td colspan="4">No active vehicles</td></tr>`;
+    }
+
+    function renderExitTable() {
+      exitBody.innerHTML = exitRecords.slice(0, 30).map(r => {
+        return `<tr><td>${r.plate}</td><td>${r.typeLabel}</td><td>${r.slotId}</td><td>${formatDuration(r.durationSec)}</td></tr>`;
+      }).join("") || `<tr><td colspan="4">No exit records</td></tr>`;
+    }
+
+    function renderAll() {
+      renderStats();
+      renderTypeAvailability();
+      renderSlotMap();
+      renderActiveTable();
+      renderExitTable();
+    }
+
+    function seedSampleData() {
+      const demo = [
+        ["TN01AB1234", "two", 540],
+        ["TN14CD7788", "car", 720],
+        ["TN88EF4567", "auto", 360],
+        ["TN09GH1122", "van", 930]
+      ];
+
+      for (const [plate, typeId, secAgo] of demo) {
+        const slot = allocateNearest(typeId);
+        if (!slot) continue;
+
+        slot.occupied = true;
+        slot.plate = plate;
+        slot.entryMs = Date.now() - secAgo * 1000;
+
+        activeByPlate.set(plate, {
+          plate,
+          typeId,
+          slotId: slot.id,
+          slotIdx: slot.idx,
+          entryMs: slot.entryMs
+        });
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
